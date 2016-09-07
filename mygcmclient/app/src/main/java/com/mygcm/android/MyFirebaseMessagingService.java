@@ -8,9 +8,20 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by sliang on 9/2/2016.
@@ -45,7 +56,37 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
 
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
+        //callback
+        request(remoteMessage.getNotification().getBody());
     }
+
+    private StringBuffer request(String urlString) {
+        // TODO Auto-generated method stub
+
+        StringBuffer chaine = new StringBuffer("");
+        int responseCode = 0;
+
+        try{
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            BufferedWriter writer  = new BufferedWriter(
+                    new OutputStreamWriter(connection.getOutputStream()));
+            writer.write("{\"message\":\"hi\"}");
+            writer.close();
+
+            responseCode=connection.getResponseCode();
+        } catch (IOException e) {
+            // writing exception to log
+            e.printStackTrace();
+        }
+
+        return chaine;
+    }
+
 }
